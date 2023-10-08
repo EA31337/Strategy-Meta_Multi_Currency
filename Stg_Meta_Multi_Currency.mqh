@@ -9,12 +9,10 @@
 
 // User input params.
 INPUT2_GROUP("Meta Multi Currency strategy: main params");
-INPUT2 ENUM_STRATEGY Meta_Multi_Currency_Strategy_RSI_Neutral =
-    STRAT_BANDS;  // Strategy for RSI at neutral range (40-60)
-INPUT2 ENUM_STRATEGY Meta_Multi_Currency_Strategy_RSI_Peak =
-    STRAT_FORCE;  // Strategy for RSI at peak range (0-20,80-100)
-INPUT2 ENUM_STRATEGY Meta_Multi_Currency_Strategy_RSI_Trend =
-    STRAT_AC;  // Strategy for RSI at trend range (20-40,60-80)
+INPUT2 ENUM_STRATEGY Meta_Multi_Strategy_Symbol1 = STRAT_RSI;   // Strategy for symbol 1
+INPUT2 ENUM_STRATEGY Meta_Multi_Strategy_Symbol2 = STRAT_RSI;   // Strategy for symbol 2
+INPUT2 ENUM_STRATEGY Meta_Multi_Strategy_Symbol3 = STRAT_NONE;  // Strategy for symbol 3
+INPUT2 ENUM_STRATEGY Meta_Multi_Strategy_Symbol4 = STRAT_NONE;  // Strategy for symbol 4
 INPUT2_GROUP("Meta Multi Currency strategy: common params");
 INPUT2 float Meta_Multi_Currency_LotSize = 0;                // Lot size
 INPUT2 int Meta_Multi_Currency_SignalOpenMethod = 0;         // Signal open method
@@ -33,11 +31,6 @@ INPUT2 short Meta_Multi_Currency_Shift = 0;                  // Shift
 INPUT2 float Meta_Multi_Currency_OrderCloseLoss = 200;       // Order close loss
 INPUT2 float Meta_Multi_Currency_OrderCloseProfit = 200;     // Order close profit
 INPUT2 int Meta_Multi_Currency_OrderCloseTime = 2880;        // Order close time in mins (>0) or bars (<0)
-INPUT_GROUP("Meta Multi Currency strategy: RSI oscillator params");
-INPUT int Meta_Multi_Currency_RSI_Period = 14;                                    // Period
-INPUT ENUM_APPLIED_PRICE Meta_Multi_Currency_RSI_Applied_Price = PRICE_TYPICAL;   // Applied Price
-INPUT int Meta_Multi_Currency_RSI_Shift = 0;                                      // Shift
-INPUT ENUM_IDATA_SOURCE_TYPE Meta_Multi_Currency_RSI_SourceType = IDATA_BUILTIN;  // Source type
 
 // Structs.
 // Defines struct with default user strategy values.
@@ -60,10 +53,11 @@ struct Stg_Meta_Multi_Currency_Params_Defaults : StgParams {
 class Stg_Meta_Multi_Currency : public Strategy {
  protected:
   DictStruct<long, Ref<Strategy>> strats;
+  Trade strade;
 
  public:
   Stg_Meta_Multi_Currency(StgParams &_sparams, TradeParams &_tparams, ChartParams &_cparams, string _name = "")
-      : Strategy(_sparams, _tparams, _cparams, _name) {}
+      : Strategy(_sparams, _tparams, _cparams, _name), strade(_tparams, _cparams) {}
 
   static Stg_Meta_Multi_Currency *Init(ENUM_TIMEFRAMES _tf = NULL, EA *_ea = NULL) {
     // Initialize strategy initial values.
@@ -80,16 +74,27 @@ class Stg_Meta_Multi_Currency : public Strategy {
    * Event on strategy's init.
    */
   void OnInit() {
-    StrategyAdd(Meta_Multi_Currency_Strategy_RSI_Neutral, 0);
-    StrategyAdd(Meta_Multi_Currency_Strategy_RSI_Peak, 1);
-    StrategyAdd(Meta_Multi_Currency_Strategy_RSI_Trend, 2);
-    // Initialize indicators.
-    {
-      IndiRSIParams _indi_params(::Meta_Multi_Currency_RSI_Period, ::Meta_Multi_Currency_RSI_Applied_Price,
-                                 ::Meta_Multi_Currency_RSI_Shift);
-      _indi_params.SetDataSourceType(::Meta_Multi_Currency_RSI_SourceType);
-      _indi_params.SetTf(PERIOD_D1);
-      SetIndicator(new Indi_RSI(_indi_params));
+    // Initialize strategies.
+    StrategyAdd(Meta_Multi_Strategy_Symbol1, 1);
+    StrategyAdd(Meta_Multi_Strategy_Symbol2, 2);
+    StrategyAdd(Meta_Multi_Strategy_Symbol3, 3);
+    StrategyAdd(Meta_Multi_Strategy_Symbol4, 4);
+    // Assigns strategies to different symbols.
+    Ref<Strategy> _strat_ref1 = strats.GetByKey(1);
+    if (_strat_ref1.IsSet()) {
+      // _strat_ref1.Ptr().Set<string>(CHART_PARAM_SYMBOL, _Symbol); // @fixme
+    }
+    Ref<Strategy> _strat_ref2 = strats.GetByKey(2);
+    if (_strat_ref2.IsSet()) {
+      // _strat_ref2.Ptr().Set<string>(CHART_PARAM_SYMBOL, _Symbol); // @fixme
+    }
+    Ref<Strategy> _strat_ref3 = strats.GetByKey(3);
+    if (_strat_ref3.IsSet()) {
+      // _strat_ref3.Ptr().Set<string>(CHART_PARAM_SYMBOL, _Symbol); // @fixme
+    }
+    Ref<Strategy> _strat_ref4 = strats.GetByKey(4);
+    if (_strat_ref4.IsSet()) {
+      // _strat_ref4.Ptr().Set<string>(CHART_PARAM_SYMBOL, _Symbol); // @fixme
     }
   }
 
@@ -298,33 +303,140 @@ class Stg_Meta_Multi_Currency : public Strategy {
   }
 
   /**
-   * Check strategy's opening signal.
+   * Gets strategy.
    */
-  bool SignalOpen(ENUM_ORDER_TYPE _cmd, int _method, float _level = 0.0f, int _shift = 0) {
-    bool _result = true;
-    // uint _ishift = _indi.GetShift();
-    uint _ishift = _shift;
+  Ref<Strategy> GetStrategy(int _shift = 0) {
     IndicatorBase *_indi = GetIndicator();
+    uint _ishift = _shift + 1;  // + _indi.GetShift()?
     Ref<Strategy> _strat_ref;
-    if (_indi[_ishift][0] <= 20 || _indi[_ishift][0] >= 80) {
-      // RSI value is at peak range (0-20 or 80-100).
-      _strat_ref = strats.GetByKey(1);
-    } else if (_indi[_ishift][0] < 40 || _indi[_ishift][0] > 60) {
-      // RSI value is at trend range (20-40 or 60-80).
-      _strat_ref = strats.GetByKey(2);
-    } else if (_indi[_ishift][0] > 40 && _indi[_ishift][0] < 60) {
-      // RSI value is at neutral range (40-60).
-      _strat_ref = strats.GetByKey(0);
+    //_strat_ref = strats.GetByKey(0);
+    return _strat_ref;
+  }
+
+  /**
+   * Gets symbol.
+   */
+  string GetSymbol(int _index) {
+    int _total_symbols = SymbolsTotal(true);
+    return SymbolName(_index, true);
+  }
+
+  /**
+   * Process a trade request.
+   *
+   * @return
+   *   Returns true on successful request.
+   */
+  virtual bool TradeRequest(ENUM_ORDER_TYPE _cmd, string _symbol = NULL, Strategy *_strat = NULL, int _shift = 0) {
+    bool _result = false;
+    Ref<Strategy> _strat_ref = GetStrategy(_shift);
+    if (!_strat_ref.IsSet()) {
+      // Returns false when strategy is not set.
+      return false;
     }
+    // Prepare a request.
+    MqlTradeRequest _request = strade.GetTradeOpenRequest(_cmd);
+    _request.comment = _strat_ref.Ptr().GetOrderOpenComment();
+    _request.magic = _strat_ref.Ptr().Get<long>(STRAT_PARAM_ID);
+    _request.price = SymbolInfoStatic::GetOpenOffer(_symbol, _cmd);
+    _request.volume = fmax(_strat_ref.Ptr().Get<float>(STRAT_PARAM_LS), SymbolInfoStatic::GetVolumeMin(_symbol));
+    _request.volume = strade.NormalizeLots(_request.volume);
+    // Prepare an order parameters.
+    OrderParams _oparams;
+    _strat_ref.Ptr().OnOrderOpen(_oparams);
+    // Send the request.
+    _result = strade.RequestSend(_request, _oparams);
+    return _result;
+  }
+
+  /**
+   * Event on strategy's order open.
+   */
+  virtual void OnOrderOpen(OrderParams &_oparams) {
+    // @todo: EA31337-classes/issues/723
+    Strategy::OnOrderOpen(_oparams);
+  }
+
+  /**
+   * Gets price stop value.
+   */
+  float PriceStop(ENUM_ORDER_TYPE _cmd, ENUM_ORDER_TYPE_VALUE _mode, int _method = 0, float _level = 0.0f,
+                  short _bars = 4) {
+    float _result = 0;
+    uint _shift = 0;
+    if (_method == 0) {
+      // Ignores calculation when method is 0.
+      return (float)_result;
+    }
+    Ref<Strategy> _strat_ref = GetStrategy(_shift);
     if (!_strat_ref.IsSet()) {
       // Returns false when strategy is not set.
       return false;
     }
     _level = _level == 0.0f ? _strat_ref.Ptr().Get<float>(STRAT_PARAM_SOL) : _level;
-    _method = _method == 0 ? _strat_ref.Ptr().Get<int>(STRAT_PARAM_SOM) : _method;
-    _shift = _shift == 0 ? _strat_ref.Ptr().Get<int>(STRAT_PARAM_SHIFT) : _shift;
-    _result &= _strat_ref.Ptr().SignalOpen(_cmd, _method, _level, _shift);
-    return _result;
+    _method = _strat_ref.Ptr().Get<int>(STRAT_PARAM_SOM);
+    //_shift = _shift == 0 ? _strat_ref.Ptr().Get<int>(STRAT_PARAM_SHIFT) : _shift;
+    _result = _strat_ref.Ptr().PriceStop(_cmd, _mode, _method, _level /*, _shift*/);
+    return (float)_result;
+  }
+
+  /**
+   * Check strategy's opening signal.
+   */
+  bool SignalOpen(ENUM_ORDER_TYPE _cmd, int _method, float _level = 0.0f, int _shift = 0) {
+    bool _result = true, _result1 = false, _result2 = false, _result3 = false, _result4 = false;
+    // uint _ishift = _indi.GetShift();
+    uint _ishift = _shift;
+    string _symbol = NULL;
+    // Process strategy 1.
+    Ref<Strategy> _strat_ref1 = strats.GetByKey(1);
+    if (_strat_ref1.IsSet()) {
+      _level = _level == 0.0f ? _strat_ref1.Ptr().Get<float>(STRAT_PARAM_SOL) : _level;
+      _method = _method == 0 ? _strat_ref1.Ptr().Get<int>(STRAT_PARAM_SOM) : _method;
+      _shift = _shift == 0 ? _strat_ref1.Ptr().Get<int>(STRAT_PARAM_SHIFT) : _shift;
+      _result1 = _strat_ref1.Ptr().SignalOpen(_cmd, _method, _level, _shift);
+      if (_result1) {
+        _symbol = SymbolName(1, true);
+        TradeRequest(_cmd, _symbol, GetPointer(this), _shift);
+      }
+    }
+    // Process strategy 2.
+    Ref<Strategy> _strat_ref2 = strats.GetByKey(2);
+    if (_strat_ref2.IsSet()) {
+      _level = _level == 0.0f ? _strat_ref2.Ptr().Get<float>(STRAT_PARAM_SOL) : _level;
+      _method = _method == 0 ? _strat_ref2.Ptr().Get<int>(STRAT_PARAM_SOM) : _method;
+      _shift = _shift == 0 ? _strat_ref2.Ptr().Get<int>(STRAT_PARAM_SHIFT) : _shift;
+      _result2 = _strat_ref2.Ptr().SignalOpen(_cmd, _method, _level, _shift);
+      if (_result2) {
+        _symbol = SymbolName(2, true);
+        TradeRequest(_cmd, _symbol, GetPointer(this), _shift);
+      }
+    }
+    // Process strategy 3.
+    Ref<Strategy> _strat_ref3 = strats.GetByKey(3);
+    if (_strat_ref3.IsSet()) {
+      _level = _level == 0.0f ? _strat_ref3.Ptr().Get<float>(STRAT_PARAM_SOL) : _level;
+      _method = _method == 0 ? _strat_ref3.Ptr().Get<int>(STRAT_PARAM_SOM) : _method;
+      _shift = _shift == 0 ? _strat_ref3.Ptr().Get<int>(STRAT_PARAM_SHIFT) : _shift;
+      _result3 = _strat_ref3.Ptr().SignalOpen(_cmd, _method, _level, _shift);
+      if (_result3) {
+        _symbol = SymbolName(3, true);
+        TradeRequest(_cmd, _symbol, GetPointer(this), _shift);
+      }
+    }
+    // Process strategy 4.
+    Ref<Strategy> _strat_ref4 = strats.GetByKey(4);
+    if (_strat_ref4.IsSet()) {
+      _level = _level == 0.0f ? _strat_ref4.Ptr().Get<float>(STRAT_PARAM_SOL) : _level;
+      _method = _method == 0 ? _strat_ref4.Ptr().Get<int>(STRAT_PARAM_SOM) : _method;
+      _shift = _shift == 0 ? _strat_ref4.Ptr().Get<int>(STRAT_PARAM_SHIFT) : _shift;
+      _result3 = _strat_ref4.Ptr().SignalOpen(_cmd, _method, _level, _shift);
+      if (_result4) {
+        _symbol = SymbolName(4, true);
+        TradeRequest(_cmd, _symbol, GetPointer(this), _shift);
+      }
+    }
+    return _result1 || _result2 || _result3 || _result4;
   }
 
   /**
