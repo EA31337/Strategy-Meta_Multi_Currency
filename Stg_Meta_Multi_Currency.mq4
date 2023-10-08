@@ -6,7 +6,7 @@
 
 /**
  * @file
- * Implements RSI meta strategy.
+ * Implements Multi Currency meta strategy.
  */
 
 // Includes the main code.

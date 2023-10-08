@@ -1,73 +1,78 @@
 /**
  * @file
- * Implements RSI meta strategy.
+ * Implements Multi Currency meta strategy.
  */
 
 // Prevents processing this includes file multiple times.
-#ifndef STG_META_RSI_MQH
-#define STG_META_RSI_MQH
+#ifndef STG_META_MULTI_CURRENCY_MQH
+#define STG_META_MULTI_CURRENCY_MQH
 
 // User input params.
-INPUT2_GROUP("Meta RSI strategy: main params");
-INPUT2 ENUM_STRATEGY Meta_RSI_Strategy_RSI_Neutral = STRAT_BANDS;  // Strategy for RSI at neutral range (40-60)
-INPUT2 ENUM_STRATEGY Meta_RSI_Strategy_RSI_Peak = STRAT_FORCE;     // Strategy for RSI at peak range (0-20,80-100)
-INPUT2 ENUM_STRATEGY Meta_RSI_Strategy_RSI_Trend = STRAT_AC;       // Strategy for RSI at trend range (20-40,60-80)
-INPUT2_GROUP("Meta RSI strategy: common params");
-INPUT2 float Meta_RSI_LotSize = 0;                // Lot size
-INPUT2 int Meta_RSI_SignalOpenMethod = 0;         // Signal open method
-INPUT2 float Meta_RSI_SignalOpenLevel = 0;        // Signal open level
-INPUT2 int Meta_RSI_SignalOpenFilterMethod = 32;  // Signal open filter method
-INPUT2 int Meta_RSI_SignalOpenFilterTime = 3;     // Signal open filter time (0-31)
-INPUT2 int Meta_RSI_SignalOpenBoostMethod = 0;    // Signal open boost method
-INPUT2 int Meta_RSI_SignalCloseMethod = 0;        // Signal close method
-INPUT2 int Meta_RSI_SignalCloseFilter = 32;       // Signal close filter (-127-127)
-INPUT2 float Meta_RSI_SignalCloseLevel = 0;       // Signal close level
-INPUT2 int Meta_RSI_PriceStopMethod = 0;          // Price limit method
-INPUT2 float Meta_RSI_PriceStopLevel = 2;         // Price limit level
-INPUT2 int Meta_RSI_TickFilterMethod = 32;        // Tick filter method (0-255)
-INPUT2 float Meta_RSI_MaxSpread = 4.0;            // Max spread to trade (in pips)
-INPUT2 short Meta_RSI_Shift = 0;                  // Shift
-INPUT2 float Meta_RSI_OrderCloseLoss = 200;       // Order close loss
-INPUT2 float Meta_RSI_OrderCloseProfit = 200;     // Order close profit
-INPUT2 int Meta_RSI_OrderCloseTime = 2880;        // Order close time in mins (>0) or bars (<0)
-INPUT_GROUP("Meta RSI strategy: RSI oscillator params");
-INPUT int Meta_RSI_RSI_Period = 14;                                    // Period
-INPUT ENUM_APPLIED_PRICE Meta_RSI_RSI_Applied_Price = PRICE_TYPICAL;   // Applied Price
-INPUT int Meta_RSI_RSI_Shift = 0;                                      // Shift
-INPUT ENUM_IDATA_SOURCE_TYPE Meta_RSI_RSI_SourceType = IDATA_BUILTIN;  // Source type
+INPUT2_GROUP("Meta Multi Currency strategy: main params");
+INPUT2 ENUM_STRATEGY Meta_Multi_Currency_Strategy_RSI_Neutral =
+    STRAT_BANDS;  // Strategy for RSI at neutral range (40-60)
+INPUT2 ENUM_STRATEGY Meta_Multi_Currency_Strategy_RSI_Peak =
+    STRAT_FORCE;  // Strategy for RSI at peak range (0-20,80-100)
+INPUT2 ENUM_STRATEGY Meta_Multi_Currency_Strategy_RSI_Trend =
+    STRAT_AC;  // Strategy for RSI at trend range (20-40,60-80)
+INPUT2_GROUP("Meta Multi Currency strategy: common params");
+INPUT2 float Meta_Multi_Currency_LotSize = 0;                // Lot size
+INPUT2 int Meta_Multi_Currency_SignalOpenMethod = 0;         // Signal open method
+INPUT2 float Meta_Multi_Currency_SignalOpenLevel = 0;        // Signal open level
+INPUT2 int Meta_Multi_Currency_SignalOpenFilterMethod = 32;  // Signal open filter method
+INPUT2 int Meta_Multi_Currency_SignalOpenFilterTime = 3;     // Signal open filter time (0-31)
+INPUT2 int Meta_Multi_Currency_SignalOpenBoostMethod = 0;    // Signal open boost method
+INPUT2 int Meta_Multi_Currency_SignalCloseMethod = 0;        // Signal close method
+INPUT2 int Meta_Multi_Currency_SignalCloseFilter = 32;       // Signal close filter (-127-127)
+INPUT2 float Meta_Multi_Currency_SignalCloseLevel = 0;       // Signal close level
+INPUT2 int Meta_Multi_Currency_PriceStopMethod = 0;          // Price limit method
+INPUT2 float Meta_Multi_Currency_PriceStopLevel = 2;         // Price limit level
+INPUT2 int Meta_Multi_Currency_TickFilterMethod = 32;        // Tick filter method (0-255)
+INPUT2 float Meta_Multi_Currency_MaxSpread = 4.0;            // Max spread to trade (in pips)
+INPUT2 short Meta_Multi_Currency_Shift = 0;                  // Shift
+INPUT2 float Meta_Multi_Currency_OrderCloseLoss = 200;       // Order close loss
+INPUT2 float Meta_Multi_Currency_OrderCloseProfit = 200;     // Order close profit
+INPUT2 int Meta_Multi_Currency_OrderCloseTime = 2880;        // Order close time in mins (>0) or bars (<0)
+INPUT_GROUP("Meta Multi Currency strategy: RSI oscillator params");
+INPUT int Meta_Multi_Currency_RSI_Period = 14;                                    // Period
+INPUT ENUM_APPLIED_PRICE Meta_Multi_Currency_RSI_Applied_Price = PRICE_TYPICAL;   // Applied Price
+INPUT int Meta_Multi_Currency_RSI_Shift = 0;                                      // Shift
+INPUT ENUM_IDATA_SOURCE_TYPE Meta_Multi_Currency_RSI_SourceType = IDATA_BUILTIN;  // Source type
 
 // Structs.
 // Defines struct with default user strategy values.
-struct Stg_Meta_RSI_Params_Defaults : StgParams {
-  Stg_Meta_RSI_Params_Defaults()
-      : StgParams(::Meta_RSI_SignalOpenMethod, ::Meta_RSI_SignalOpenFilterMethod, ::Meta_RSI_SignalOpenLevel,
-                  ::Meta_RSI_SignalOpenBoostMethod, ::Meta_RSI_SignalCloseMethod, ::Meta_RSI_SignalCloseFilter,
-                  ::Meta_RSI_SignalCloseLevel, ::Meta_RSI_PriceStopMethod, ::Meta_RSI_PriceStopLevel,
-                  ::Meta_RSI_TickFilterMethod, ::Meta_RSI_MaxSpread, ::Meta_RSI_Shift) {
-    Set(STRAT_PARAM_LS, ::Meta_RSI_LotSize);
-    Set(STRAT_PARAM_OCL, ::Meta_RSI_OrderCloseLoss);
-    Set(STRAT_PARAM_OCP, ::Meta_RSI_OrderCloseProfit);
-    Set(STRAT_PARAM_OCT, ::Meta_RSI_OrderCloseTime);
-    Set(STRAT_PARAM_SOFT, ::Meta_RSI_SignalOpenFilterTime);
+struct Stg_Meta_Multi_Currency_Params_Defaults : StgParams {
+  Stg_Meta_Multi_Currency_Params_Defaults()
+      : StgParams(::Meta_Multi_Currency_SignalOpenMethod, ::Meta_Multi_Currency_SignalOpenFilterMethod,
+                  ::Meta_Multi_Currency_SignalOpenLevel, ::Meta_Multi_Currency_SignalOpenBoostMethod,
+                  ::Meta_Multi_Currency_SignalCloseMethod, ::Meta_Multi_Currency_SignalCloseFilter,
+                  ::Meta_Multi_Currency_SignalCloseLevel, ::Meta_Multi_Currency_PriceStopMethod,
+                  ::Meta_Multi_Currency_PriceStopLevel, ::Meta_Multi_Currency_TickFilterMethod,
+                  ::Meta_Multi_Currency_MaxSpread, ::Meta_Multi_Currency_Shift) {
+    Set(STRAT_PARAM_LS, ::Meta_Multi_Currency_LotSize);
+    Set(STRAT_PARAM_OCL, ::Meta_Multi_Currency_OrderCloseLoss);
+    Set(STRAT_PARAM_OCP, ::Meta_Multi_Currency_OrderCloseProfit);
+    Set(STRAT_PARAM_OCT, ::Meta_Multi_Currency_OrderCloseTime);
+    Set(STRAT_PARAM_SOFT, ::Meta_Multi_Currency_SignalOpenFilterTime);
   }
 };
 
-class Stg_Meta_RSI : public Strategy {
+class Stg_Meta_Multi_Currency : public Strategy {
  protected:
   DictStruct<long, Ref<Strategy>> strats;
 
  public:
-  Stg_Meta_RSI(StgParams &_sparams, TradeParams &_tparams, ChartParams &_cparams, string _name = "")
+  Stg_Meta_Multi_Currency(StgParams &_sparams, TradeParams &_tparams, ChartParams &_cparams, string _name = "")
       : Strategy(_sparams, _tparams, _cparams, _name) {}
 
-  static Stg_Meta_RSI *Init(ENUM_TIMEFRAMES _tf = NULL, EA *_ea = NULL) {
+  static Stg_Meta_Multi_Currency *Init(ENUM_TIMEFRAMES _tf = NULL, EA *_ea = NULL) {
     // Initialize strategy initial values.
-    Stg_Meta_RSI_Params_Defaults stg_rsi_defaults;
-    StgParams _stg_params(stg_rsi_defaults);
+    Stg_Meta_Multi_Currency_Params_Defaults stg_meta_multi_currency_defaults;
+    StgParams _stg_params(stg_meta_multi_currency_defaults);
     // Initialize Strategy instance.
     ChartParams _cparams(_tf, _Symbol);
     TradeParams _tparams;
-    Strategy *_strat = new Stg_Meta_RSI(_stg_params, _tparams, _cparams, "(Meta) RSI");
+    Strategy *_strat = new Stg_Meta_Multi_Currency(_stg_params, _tparams, _cparams, "(Meta) Multi Currency");
     return _strat;
   }
 
@@ -75,13 +80,14 @@ class Stg_Meta_RSI : public Strategy {
    * Event on strategy's init.
    */
   void OnInit() {
-    StrategyAdd(Meta_RSI_Strategy_RSI_Neutral, 0);
-    StrategyAdd(Meta_RSI_Strategy_RSI_Peak, 1);
-    StrategyAdd(Meta_RSI_Strategy_RSI_Trend, 2);
+    StrategyAdd(Meta_Multi_Currency_Strategy_RSI_Neutral, 0);
+    StrategyAdd(Meta_Multi_Currency_Strategy_RSI_Peak, 1);
+    StrategyAdd(Meta_Multi_Currency_Strategy_RSI_Trend, 2);
     // Initialize indicators.
     {
-      IndiRSIParams _indi_params(::Meta_RSI_RSI_Period, ::Meta_RSI_RSI_Applied_Price, ::Meta_RSI_RSI_Shift);
-      _indi_params.SetDataSourceType(::Meta_RSI_RSI_SourceType);
+      IndiRSIParams _indi_params(::Meta_Multi_Currency_RSI_Period, ::Meta_Multi_Currency_RSI_Applied_Price,
+                                 ::Meta_Multi_Currency_RSI_Shift);
+      _indi_params.SetDataSourceType(::Meta_Multi_Currency_RSI_SourceType);
       _indi_params.SetTf(PERIOD_D1);
       SetIndicator(new Indi_RSI(_indi_params));
     }
@@ -331,4 +337,4 @@ class Stg_Meta_RSI : public Strategy {
   }
 };
 
-#endif  // STG_META_RSI_MQH
+#endif  // STG_META_MULTI_CURRENCY_MQH
