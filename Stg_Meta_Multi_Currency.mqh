@@ -305,13 +305,15 @@ class Stg_Meta_Multi_Currency : public Strategy {
   /**
    * Gets strategy.
    */
+  /*
   Ref<Strategy> GetStrategy(int _shift = 0) {
-    IndicatorBase *_indi = GetIndicator();
+    // IndicatorBase *_indi = GetIndicator();
     uint _ishift = _shift + 1;  // + _indi.GetShift()?
     Ref<Strategy> _strat_ref;
     //_strat_ref = strats.GetByKey(0);
     return _strat_ref;
   }
+  */
 
   /**
    * Gets symbol.
@@ -329,21 +331,24 @@ class Stg_Meta_Multi_Currency : public Strategy {
    */
   virtual bool TradeRequest(ENUM_ORDER_TYPE _cmd, string _symbol = NULL, Strategy *_strat = NULL, int _shift = 0) {
     bool _result = false;
+    /*
     Ref<Strategy> _strat_ref = GetStrategy(_shift);
     if (!_strat_ref.IsSet()) {
       // Returns false when strategy is not set.
       return false;
     }
+    */
     // Prepare a request.
     MqlTradeRequest _request = strade.GetTradeOpenRequest(_cmd);
-    _request.comment = _strat_ref.Ptr().GetOrderOpenComment();
-    _request.magic = _strat_ref.Ptr().Get<long>(STRAT_PARAM_ID);
+    _request.comment = /*_strat_ref.Ptr().*/ GetOrderOpenComment();
+    _request.magic = /*_strat_ref.Ptr().*/ Get<long>(STRAT_PARAM_ID);
     _request.price = SymbolInfoStatic::GetOpenOffer(_symbol, _cmd);
-    _request.volume = fmax(_strat_ref.Ptr().Get<float>(STRAT_PARAM_LS), SymbolInfoStatic::GetVolumeMin(_symbol));
+    _request.symbol = _symbol;
+    _request.volume = fmax(/*_strat_ref.Ptr().*/ Get<float>(STRAT_PARAM_LS), SymbolInfoStatic::GetVolumeMin(_symbol));
     _request.volume = strade.NormalizeLots(_request.volume);
     // Prepare an order parameters.
     OrderParams _oparams;
-    _strat_ref.Ptr().OnOrderOpen(_oparams);
+    /*_strat_ref.Ptr().*/ OnOrderOpen(_oparams);
     // Send the request.
     _result = strade.RequestSend(_request, _oparams);
     return _result;
@@ -368,7 +373,7 @@ class Stg_Meta_Multi_Currency : public Strategy {
       // Ignores calculation when method is 0.
       return (float)_result;
     }
-    Ref<Strategy> _strat_ref = GetStrategy(_shift);
+    Ref<Strategy> _strat_ref = strats.GetByKey(1);  // @todo: Support for multi-currency.
     if (!_strat_ref.IsSet()) {
       // Returns false when strategy is not set.
       return false;
@@ -396,7 +401,7 @@ class Stg_Meta_Multi_Currency : public Strategy {
       _shift = _shift == 0 ? _strat_ref1.Ptr().Get<int>(STRAT_PARAM_SHIFT) : _shift;
       _result1 = _strat_ref1.Ptr().SignalOpen(_cmd, _method, _level, _shift);
       if (_result1) {
-        _symbol = SymbolName(1, true);
+        _symbol = SymbolName(0, true);
         TradeRequest(_cmd, _symbol, GetPointer(this), _shift);
       }
     }
@@ -408,7 +413,7 @@ class Stg_Meta_Multi_Currency : public Strategy {
       _shift = _shift == 0 ? _strat_ref2.Ptr().Get<int>(STRAT_PARAM_SHIFT) : _shift;
       _result2 = _strat_ref2.Ptr().SignalOpen(_cmd, _method, _level, _shift);
       if (_result2) {
-        _symbol = SymbolName(2, true);
+        _symbol = SymbolName(1, true);
         TradeRequest(_cmd, _symbol, GetPointer(this), _shift);
       }
     }
@@ -420,7 +425,7 @@ class Stg_Meta_Multi_Currency : public Strategy {
       _shift = _shift == 0 ? _strat_ref3.Ptr().Get<int>(STRAT_PARAM_SHIFT) : _shift;
       _result3 = _strat_ref3.Ptr().SignalOpen(_cmd, _method, _level, _shift);
       if (_result3) {
-        _symbol = SymbolName(3, true);
+        _symbol = SymbolName(2, true);
         TradeRequest(_cmd, _symbol, GetPointer(this), _shift);
       }
     }
@@ -432,7 +437,7 @@ class Stg_Meta_Multi_Currency : public Strategy {
       _shift = _shift == 0 ? _strat_ref4.Ptr().Get<int>(STRAT_PARAM_SHIFT) : _shift;
       _result3 = _strat_ref4.Ptr().SignalOpen(_cmd, _method, _level, _shift);
       if (_result4) {
-        _symbol = SymbolName(4, true);
+        _symbol = SymbolName(3, true);
         TradeRequest(_cmd, _symbol, GetPointer(this), _shift);
       }
     }
