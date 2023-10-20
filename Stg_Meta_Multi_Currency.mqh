@@ -10,7 +10,7 @@
 // User input params.
 INPUT2_GROUP("Meta Multi Currency strategy: main params");
 INPUT2 ENUM_STRATEGY Meta_Multi_Strategy_Symbol1 = STRAT_RSI;   // Strategy for symbol 1
-INPUT2 ENUM_STRATEGY Meta_Multi_Strategy_Symbol2 = STRAT_RSI;   // Strategy for symbol 2
+INPUT2 ENUM_STRATEGY Meta_Multi_Strategy_Symbol2 = STRAT_NONE;  // Strategy for symbol 2
 INPUT2 ENUM_STRATEGY Meta_Multi_Strategy_Symbol3 = STRAT_NONE;  // Strategy for symbol 3
 INPUT2 ENUM_STRATEGY Meta_Multi_Strategy_Symbol4 = STRAT_NONE;  // Strategy for symbol 4
 INPUT2_GROUP("Meta Multi Currency strategy: common params");
