@@ -13,24 +13,24 @@ INPUT2 ENUM_STRATEGY Meta_Multi_Strategy_Symbol1 = STRAT_NONE;  // Strategy for 
 INPUT2 ENUM_STRATEGY Meta_Multi_Strategy_Symbol2 = STRAT_NONE;  // Strategy for symbol 2
 INPUT2 ENUM_STRATEGY Meta_Multi_Strategy_Symbol3 = STRAT_NONE;  // Strategy for symbol 3
 INPUT2 ENUM_STRATEGY Meta_Multi_Strategy_Symbol4 = STRAT_NONE;  // Strategy for symbol 4
-INPUT2_GROUP("Meta Multi Currency strategy: common params");
-INPUT2 float Meta_Multi_Currency_LotSize = 0;                // Lot size
-INPUT2 int Meta_Multi_Currency_SignalOpenMethod = 0;         // Signal open method
-INPUT2 float Meta_Multi_Currency_SignalOpenLevel = 0;        // Signal open level
-INPUT2 int Meta_Multi_Currency_SignalOpenFilterMethod = 32;  // Signal open filter method
-INPUT2 int Meta_Multi_Currency_SignalOpenFilterTime = 3;     // Signal open filter time (0-31)
-INPUT2 int Meta_Multi_Currency_SignalOpenBoostMethod = 0;    // Signal open boost method
-INPUT2 int Meta_Multi_Currency_SignalCloseMethod = 0;        // Signal close method
-INPUT2 int Meta_Multi_Currency_SignalCloseFilter = 32;       // Signal close filter (-127-127)
-INPUT2 float Meta_Multi_Currency_SignalCloseLevel = 0;       // Signal close level
-INPUT2 int Meta_Multi_Currency_PriceStopMethod = 0;          // Price limit method
-INPUT2 float Meta_Multi_Currency_PriceStopLevel = 2;         // Price limit level
-INPUT2 int Meta_Multi_Currency_TickFilterMethod = 32;        // Tick filter method (0-255)
-INPUT2 float Meta_Multi_Currency_MaxSpread = 4.0;            // Max spread to trade (in pips)
-INPUT2 short Meta_Multi_Currency_Shift = 0;                  // Shift
-INPUT2 float Meta_Multi_Currency_OrderCloseLoss = 200;       // Order close loss
-INPUT2 float Meta_Multi_Currency_OrderCloseProfit = 200;     // Order close profit
-INPUT2 int Meta_Multi_Currency_OrderCloseTime = 2880;        // Order close time in mins (>0) or bars (<0)
+INPUT3_GROUP("Meta Multi Currency strategy: common params");
+INPUT3 float Meta_Multi_Currency_LotSize = 0;                // Lot size
+INPUT3 int Meta_Multi_Currency_SignalOpenMethod = 0;         // Signal open method
+INPUT3 float Meta_Multi_Currency_SignalOpenLevel = 0;        // Signal open level
+INPUT3 int Meta_Multi_Currency_SignalOpenFilterMethod = 32;  // Signal open filter method
+INPUT3 int Meta_Multi_Currency_SignalOpenFilterTime = 3;     // Signal open filter time (0-31)
+INPUT3 int Meta_Multi_Currency_SignalOpenBoostMethod = 0;    // Signal open boost method
+INPUT3 int Meta_Multi_Currency_SignalCloseMethod = 0;        // Signal close method
+INPUT3 int Meta_Multi_Currency_SignalCloseFilter = 32;       // Signal close filter (-127-127)
+INPUT3 float Meta_Multi_Currency_SignalCloseLevel = 0;       // Signal close level
+INPUT3 int Meta_Multi_Currency_PriceStopMethod = 0;          // Price limit method
+INPUT3 float Meta_Multi_Currency_PriceStopLevel = 2;         // Price limit level
+INPUT3 int Meta_Multi_Currency_TickFilterMethod = 32;        // Tick filter method (0-255)
+INPUT3 float Meta_Multi_Currency_MaxSpread = 4.0;            // Max spread to trade (in pips)
+INPUT3 short Meta_Multi_Currency_Shift = 0;                  // Shift
+INPUT3 float Meta_Multi_Currency_OrderCloseLoss = 200;       // Order close loss
+INPUT3 float Meta_Multi_Currency_OrderCloseProfit = 200;     // Order close profit
+INPUT3 int Meta_Multi_Currency_OrderCloseTime = 2880;        // Order close time in mins (>0) or bars (<0)
 
 // Structs.
 // Defines struct with default user strategy values.
